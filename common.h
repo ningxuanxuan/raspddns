@@ -5,7 +5,9 @@ typedef struct
 {
     unsigned int domain_id;
     unsigned int record_id;
-	char record[16];
+    char record_type[10];
+    char line_type[10];
+    char record[16];
     char domain_name[256];
     char username   [256];
     char password   [256];
@@ -14,26 +16,26 @@ typedef struct
 
 typedef struct 
 {
-	unsigned int domain_id;
-	int status;
-	char name[64];
+    unsigned int domain_id;
+    int status;
+    char name[64];
 }result_domain_t;
 
 typedef struct
 {
-	unsigned int record_id;
-	int status;
-	char name[64];
-	char value[16];
-}result_sub_domain_t;		
+    unsigned int record_id;
+    int status;
+    char name[64];
+    char value[16];
+}result_sub_domain_t;       
 
 typedef struct 
 {
-	int code;
-	unsigned int domain_num;
-	unsigned int sub_domain_num;
-	result_domain_t *domain;
-	result_sub_domain_t *sub_domain;
+    int code;
+    unsigned int domain_num;
+    unsigned int sub_domain_num;
+    result_domain_t *domain;
+    result_sub_domain_t *sub_domain;
 }result_t;
 
 struct MemoryStruct {
