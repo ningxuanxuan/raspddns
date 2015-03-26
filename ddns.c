@@ -35,8 +35,10 @@ int main()
         printf("init domain info failed!\n");
     }
     
-    printf( "get info success! begin mainloop\n" );
-
+    printf( "get info success! begin daemon\n" );
+    
+    daemon(1, 0);
+    
     while(1)
     {
         if ( getlocalip(strip, 16) || strcmp(strip, domain_info.record ) == 0 )
