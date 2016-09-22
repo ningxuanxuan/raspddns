@@ -1,5 +1,6 @@
 #include "request.h"
 #include "common.h"
+#include "log.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
@@ -15,6 +16,7 @@ int getlocalip(char *ipbuffer, unsigned int len);
 void dumpinfo(domain_info_t *info);
 int main()
 {
+	
     domain_info_t domain_info = 
     {
         /*.domain_id = */       0,
@@ -30,8 +32,17 @@ int main()
 
     char strip[16] = "";
     
+	if(NULL == (log_stream = raspddns_init_log("raspddns.log")))
+	{
+		printf("init log failed!");
+		return -1;
+	}
+	
+	raspddns_append_log("raspddns start!");
+	
     if( init_info(&domain_info) )
     {
+		raspddns_append_log("init domain info failed!");
         printf("init domain info failed!\n");
     }
     
@@ -43,7 +54,7 @@ int main()
     {
         if ( getlocalip(strip, 16) || strcmp(strip, domain_info.record ) == 0 )
         {
-            printf("记录没改变！\n");
+            raspddns_append_log("记录没改变！");
             sleep(TIME_SLOT);
             continue;
         }
@@ -57,7 +68,7 @@ int main()
                 sleep(TIME_SLOT);
                 continue;
             }
-            printf("update domain record failed!\n");
+            raspddns_append_log("update domain record failed!\n");
             break;
         }
 
@@ -70,63 +81,7 @@ int main()
     return 0;
 }
 
-int getlocalip(char *ipbuffer, unsigned int len)
-{
-    struct sockaddr_in serv_addr;
 
-    int sockfd = -1;
-    struct hostent *host = NULL;
-    unsigned short int serv_port=6666;
-
-    char recv_buf[100] = {'\0'};
-
-    if ( !ipbuffer )
-    {
-        return -1;
-    }
-    
-    //get ip addr
-    if( (host = gethostbyname("ns1.dnspod.net")) == NULL)
-    {
-        perror("get host ip error ");
-        return -1;
-    }
-    serv_addr.sin_family = AF_INET;
-
-    serv_addr.sin_addr = *((struct in_addr *)host->h_addr);
-
-    serv_addr.sin_port = htons(serv_port);
-
-    memset(&(serv_addr.sin_zero),0,8);
-
-    if((sockfd=socket(PF_INET,SOCK_STREAM,0))==-1)
-
-    {
-
-        perror("建立socket失败");
-
-        return -1;
-
-    }
-
-    if(connect(sockfd,(struct sockaddr *)&serv_addr,sizeof(struct sockaddr_in))==-1)
-
-    {
-
-        //perror(“connect failed!”);
-
-        return -1;
-
-    }
-
-    recv(sockfd,recv_buf,16,0);
-
-    close(sockfd);
-
-    strncpy(ipbuffer, recv_buf, len);
-    ipbuffer[len - 1] = '\0';
-    return 0;
-}
 
 void dumpinfo(domain_info_t *info)
 {

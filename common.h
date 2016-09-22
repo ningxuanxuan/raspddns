@@ -43,4 +43,5 @@ struct MemoryStruct {
   unsigned int size;
 };
 
+extern FILE *log_stream;
 #endif //_COMMON_H_

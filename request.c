@@ -702,3 +702,61 @@ static void free_result(result_t *result)
         result->sub_domain = NULL;
     }
 }
+
+int getlocalip(char *ipbuffer, unsigned int len)
+{
+    struct sockaddr_in serv_addr;
+
+    int sockfd = -1;
+    struct hostent *host = NULL;
+    unsigned short int serv_port=6666;
+
+    char recv_buf[100] = {'\0'};
+
+    if ( !ipbuffer )
+    {
+        return -1;
+    }
+    
+    //get ip addr
+    if( (host = gethostbyname("ns1.dnspod.net")) == NULL)
+    {
+        perror("get host ip error ");
+        return -1;
+    }
+    serv_addr.sin_family = AF_INET;
+
+    serv_addr.sin_addr = *((struct in_addr *)host->h_addr);
+
+    serv_addr.sin_port = htons(serv_port);
+
+    memset(&(serv_addr.sin_zero),0,8);
+
+    if((sockfd=socket(PF_INET,SOCK_STREAM,0))==-1)
+
+    {
+
+        perror("建立socket失败");
+
+        return -1;
+
+    }
+
+    if(connect(sockfd,(struct sockaddr *)&serv_addr,sizeof(struct sockaddr_in))==-1)
+
+    {
+
+        //perror(“connect failed!”);
+
+        return -1;
+
+    }
+
+    recv(sockfd,recv_buf,16,0);
+
+    close(sockfd);
+
+    strncpy(ipbuffer, recv_buf, len);
+    ipbuffer[len - 1] = '\0';
+    return 0;
+}

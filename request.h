@@ -9,5 +9,6 @@ int getrecordid(domain_info_t *info);
 int setcommonparam(struct curl_httppost **formpost, struct curl_httppost **lastptr, const domain_info_t *info);
 int init_info(domain_info_t *info);
 int update_record(domain_info_t *info);
+int getlocalip(char *ipbuffer, unsigned int len)
 
 #endif //_REQUEST_H_
